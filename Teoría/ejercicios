@@ -1,0 +1,16 @@
+Ejercicio 3.
+cubo
+cilindro--> R=0,5 h=1
+cono--> R=0.5 h=1
+plataforma --> R = r
+
+Cubo y Cono = cámara
+cámara y cilindro = conjunto
+
+Cubo --> Escalado(4,2,1) //Aumenta el tamaño --> Transformacion de translación(-2,-1,-0.5) //Para centrarlo
+Cilindro --> Escalado(1,5y+1,1) 5y>=0 --> translación(0,0.5,0)
+Cono --> Rotar(90) //Rotamos el cono 90º  queda así <) --> Translación(1.5,0,0) 
+Cámara --> Rz(alpha) //Rotacion en z alpha grados --> Ry(beta) //Rotación en y beta grados --> translación(0,gamma+1,0) //Para unirlo con el cilindro
+plataforma --> translación(0,0.1,0)
+conjunto --> translación(-r,0.1,0) --> Ry(0,delta,0) //Para que el conjunto gire alrededor de la plataforma.
+
