@@ -588,7 +588,7 @@ _cabeza::_cabeza()
 	ancho=0.4;
 	alto=0.4;
 	fondo=0.55;
-	cubo.colors_chess(1.0,0.5,0.0,0.4,0.4,0.4);
+	cubo.colors_chess(1.0,0.5,0.0,1.0,0.35,0.0);
 };
 
 void _cabeza::draw(_modo modo, float r, float g, float b, float grosor)
@@ -609,7 +609,7 @@ _cuerpo::_cuerpo()
 	alto=0.4;
 	fondo=0.5;
 	//radio=0.15;
-	cubo.colors_chess(1.0,0.5,0.0,0.4,0.4,0.4);
+	cubo.colors_chess(1.0,0.5,0.0,1.0,0.35,0.0);
 };
 
 void _cuerpo::draw(_modo modo, float r, float g, float b, float grosor)
@@ -629,7 +629,7 @@ _pata::_pata()
 	ancho=0.1;
 	alto=0.25;
 	fondo=0.1;
-	cubo.colors_chess(1.0,0.5,0.0,0.4,0.4,0.4);
+	cubo.colors_chess(1.0,0.5,0.0,1.0,0.35,0.0);
 };
 
 void _pata::draw(_modo modo, float r, float g, float b, float grosor)
@@ -649,7 +649,7 @@ _oreja::_oreja()
 	ancho=0.1;
 	alto=0.1;
 	fondo=0.1;
-	piramide.colors_chess(1.0,0.5,0.0,0.4,0.4,0.4);
+	piramide.colors_chess(1.0,0.5,0.0,1.0,0.35,0.0);
 };
 
 void _oreja::draw(_modo modo, float r, float g, float b, float grosor)
@@ -687,7 +687,7 @@ _cola::_cola()
 {
 alto=0.25;
 radio=0.1;
-cilindro.colors_chess(1.0,0.5,0.0,0.4,0.4,0.4);
+cilindro.colors_chess(1.0,0.5,0.0,1.0,0.35,0.0);
 };
 
 void _cola::draw(_modo modo, float r, float g, float b, float grosor)
@@ -701,16 +701,36 @@ glPopMatrix();
 };
 
 //************************************************************************
-// Cola
+// Ojo
 //************************************************************************
 
 _ojo::_ojo()
 {
 radio=0.04;
-esfera.colors_chess(0.0,0.0,0.0,0.0,0.0,0.0);
+esfera.colors_chess(1.0,1.0,1.0,1.0,1.0,1.0);
 };
 
 void _ojo::draw(_modo modo, float r, float g, float b, float grosor)
+{
+glPushMatrix();
+//glRotatef(90,0,0,1);
+glScalef(radio, radio, radio);
+esfera.draw(modo, r, g, b, grosor);
+glPopMatrix();
+
+};
+
+//************************************************************************
+// Ojo
+//************************************************************************
+
+_pupila::_pupila()
+{
+radio=0.02;
+esfera.colors_chess(0.0,0.0,0.0,0.0,0.0,0.0);
+};
+
+void _pupila::draw(_modo modo, float r, float g, float b, float grosor)
 {
 glPushMatrix();
 //glRotatef(90,0,0,1);
@@ -774,6 +794,10 @@ glPushMatrix();
 			ojo.draw(modo, r, g, b, grosor);
 			glTranslatef(0,0,-cabeza.ancho+ojo.radio/2.0);
 			ojo.draw(modo, r, g, b, grosor);
+      glTranslatef(ojo.radio/2.0+pupila.radio/2.0,0,0);
+      pupila.draw(modo, r, g, b, grosor);
+      glTranslatef(0,0,+cabeza.ancho-ojo.radio/2.0);
+      pupila.draw(modo, r, g, b, grosor);
 		glPopMatrix();
 
 		glTranslatef(cabeza.ancho/2.0+hocico.ancho/2.0,-cabeza.alto/2.0+hocico.alto/2.0,0);

@@ -105,7 +105,7 @@ void  parametros(vector<_vertex3f> perfil, int num, int tipo, int tapa_in, int t
 //*************************************************************************
 class _cilindro: public _rotacion{
 public:
-	_cilindro(float radio=1.0, float altura=2.0, int num=5);
+	_cilindro(float radio=1.0, float altura=2.0, int num=6);
 };
 
 //*************************************************************************
@@ -277,6 +277,22 @@ float radio;
 protected:
 _esfera esfera;
 };
+
+//************************************************************************
+// Pupila
+//************************************************************************
+
+class _pupila: public _triangulos3D
+{
+public:
+      _pupila();
+void  draw(_modo modo, float r, float g, float b, float grosor);
+       
+float radio;
+
+protected:
+_esfera esfera;
+};
 //************************************************************************
 // Zorro(montaje del objeto final)
 //************************************************************************
@@ -319,4 +335,5 @@ _oreja oreja;
 _hocico hocico;
 _cola cola;
 _ojo ojo;
+_pupila pupila;
 };
