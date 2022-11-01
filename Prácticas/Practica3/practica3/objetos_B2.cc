@@ -713,7 +713,6 @@ esfera.colors_chess(1.0,1.0,1.0,1.0,1.0,1.0);
 void _ojo::draw(_modo modo, float r, float g, float b, float grosor)
 {
 glPushMatrix();
-//glRotatef(90,0,0,1);
 glScalef(radio, radio, radio);
 esfera.draw(modo, r, g, b, grosor);
 glPopMatrix();
@@ -733,7 +732,6 @@ esfera.colors_chess(0.0,0.0,0.0,0.0,0.0,0.0);
 void _pupila::draw(_modo modo, float r, float g, float b, float grosor)
 {
 glPushMatrix();
-//glRotatef(90,0,0,1);
 glScalef(radio, radio, radio);
 esfera.draw(modo, r, g, b, grosor);
 glPopMatrix();
