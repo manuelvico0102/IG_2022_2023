@@ -174,6 +174,75 @@ for (i=0;i<n_c;i++)
   }
 }
 
+//*************************************************************************
+
+void _triangulos3D::colors_lambert_c(float l_x, float l_y, float l_z, float r, float g, float b){
+	int i, n_c;
+	n_c=caras.size();
+	colores_caras.resize(n_c);
+	_vertex3f aux_luz, luz;
+	float modulo, p_escalar;
+
+	aux_luz.x = l_x;
+	aux_luz.y = l_y;
+	aux_luz.z = l_z;
+
+	for(i=0; i < n_c; i++){
+		luz = aux_luz - vertices[caras[i]._0];
+
+		modulo=sqrt(luz.x*luz.x+luz.y*luz.y+luz.z*luz.z);
+
+		luz.x=luz.x/modulo;
+		luz.y=luz.y/modulo;
+		luz.z=luz.z/modulo;
+
+		p_escalar=luz.x*normales_caras[i].x+luz.y*normales_caras[i].y+luz.z*normales_caras[i].z;
+		
+		if(p_escalar <= 0) p_escalar = 0;
+
+		colores_caras[i].r=r*p_escalar;
+      	colores_caras[i].g=g*p_escalar;
+      	colores_caras[i].b=b*p_escalar;
+	}
+}
+
+//*************************************************************************
+// Calcular normales
+//*************************************************************************
+
+void _triangulos3D::calcular_normales_caras(){
+	int i, n_c;
+	n_c=caras.size();
+	normales_caras.resize(n_c);
+	_vertex3f vector_a, vector_b, aux;
+	float modulo;
+
+	for(i = 0; i<n_c; i++){
+		vector_a=vertices[caras[i]._1]-vertices[caras[i]._0];
+		vector_b=vertices[caras[i]._2]-vertices[caras[i]._0];
+		
+		aux.x=vector_a.y*vector_b.z-vector_a.z*vector_b.y;
+		aux.y=vector_a.z*vector_b.x-vector_a.x*vector_b.z;
+		aux.z=vector_a.x*vector_b.y-vector_a.y*vector_b.x;
+
+		modulo=sqrt(aux.x*aux.x+aux.y*aux.y+aux.z*aux.z);
+
+		normales_caras[i].x=aux.x/modulo;
+		normales_caras[i].y=aux.y/modulo;
+		normales_caras[i].z=aux.z/modulo;
+	}
+}
+
+//*************************************************************************
+
+void _triangulos3D::calcular_normales_vertices(){
+	int i, n_v;
+	n_v=vertices.size();
+	normales_vertices.resize(n_v);
+	
+}
+
+
 
 //*************************************************************************
 // objetos o modelos
@@ -298,12 +367,12 @@ for(int i = 0; i<n_ver; i++){
   vertices[i].z=ver_ply[3*i+2];
 }
 
-colores_vertices.resize(n_ver);
+/*colores_vertices.resize(n_ver);
 for(int i=0; i<n_ver; i++){
   colores_vertices[i].r=rand()%1000/1000.0;
   colores_vertices[i].g=rand()%1000/1000.0; 
   colores_vertices[i].b=rand()%1000/1000.0; 
-}
+}*/
 
 //Caras 
 for(int i = 0; i<n_car; i++){
@@ -312,8 +381,14 @@ for(int i = 0; i<n_car; i++){
   caras[i].z=car_ply[3*i+2];
 }
 
+
+//normales a caras
+calcular_normales_caras();
+
 //Colores a las caras
-colores_caras.resize(n_car);
+colors_lambert_c(0, 10, 40, 0.8, 0.4, 0.0);
+
+/*colores_caras.resize(n_car);
 
 srand(10);
 for(int i=0; i<n_car; i++){
@@ -325,7 +400,7 @@ for(int i=0; i<n_car; i++){
     colores_caras[i].g=rand()%1000/1000.0; 
   }
   colores_caras[i].b=0.0;
-}
+}*/
 }
 
 
@@ -402,8 +477,8 @@ void _rotacion::parametros(vector<_vertex3f> perfil, int num, int tipo, int tapa
 
     for(j=0; j<num; j++){
       caras[c]._0=j*num_aux;
-      caras[c]._1=((j+1)%num)*num_aux;
-      caras[c]._2=total;
+      caras[c]._2=((j+1)%num)*num_aux;
+      caras[c]._1=total;
       c=c+1;
     }
   }
@@ -418,14 +493,16 @@ void _rotacion::parametros(vector<_vertex3f> perfil, int num, int tipo, int tapa
 
     for(j=0; j<num; j++){
       caras[c]._0=total+1;
-      caras[c]._1=((j+1)%num)*num_aux+num_aux-1;
-      caras[c]._2=num_aux-1+j*num_aux;
+      caras[c]._2=((j+1)%num)*num_aux+num_aux-1;
+      caras[c]._1=num_aux-1+j*num_aux;
       c=c+1;
     }
   }
 
+  calcular_normales_caras();
   //Colores a las caras
-  colors_random();
+  colors_lambert_c(0, 20, 20, 1.0, 0.4, 0.7);
+  //colors_random();
   /*colores_caras.resize(caras.size());
 
   for(int i=0; i<caras.size(); i++){
