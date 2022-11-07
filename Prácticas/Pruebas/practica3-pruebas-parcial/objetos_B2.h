@@ -359,6 +359,73 @@ _pupila pupila;
 };
 
 //************************************************************************
+// Cubo1
+//************************************************************************
+
+class _cubo1: public _triangulos3D
+{
+public:
+       _cubo1();
+void  draw(_modo modo, float r, float g, float b, float grosor);
+
+float lado;
+
+
+protected:
+_cubo cubo;
+};
+
+//************************************************************************
+// Cubo2
+//************************************************************************
+
+class _cubo2: public _triangulos3D
+{
+public:
+       _cubo2();
+void  draw(_modo modo, float r, float g, float b, float grosor);
+
+float lado;
+
+
+protected:
+_cubo cubo;
+};
+
+//************************************************************************
+// Cl1
+//************************************************************************
+
+class _cl1: public _triangulos3D
+{
+public:
+      _cl1();
+void  draw(_modo modo, float r, float g, float b, float grosor);
+       
+float alto;
+float radio;
+
+protected:
+_cilindro cilindro;
+};
+
+//************************************************************************
+// Cl2
+//************************************************************************
+
+class _cl2: public _triangulos3D
+{
+public:
+      _cl2();
+void  draw(_modo modo, float r, float g, float b, float grosor);
+       
+float alto;
+float radio;
+
+protected:
+_cilindro cilindro;
+};
+//************************************************************************
 // Objeto examen
 //************************************************************************
 
@@ -367,13 +434,6 @@ class _objeto: public _triangulos3D
 public:
       _objeto();
 void  draw(_modo modo, float r, float g, float b, float grosor);
-       
-float lado_c1;
-float lado_c2;
-
-
-float radio_cl1;
-float alt_cl1;
 
 float radio_cl2;
 float fondo_cl2;
@@ -382,8 +442,8 @@ float giro_base2;
 float giro_cl1;
 
 protected:
-_cubo base1;
-_cubo base2;
-_cilindro pilar1;
-_cilindro cl2;
+_cubo1 base1;
+_cubo2 base2;
+_cl1 pilar1;
+_cl2 cl2;
 };
