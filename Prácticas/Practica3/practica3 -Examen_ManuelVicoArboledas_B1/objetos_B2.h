@@ -9,7 +9,7 @@
 
 
 const float AXIS_SIZE=5000;
-typedef enum{POINTS,EDGES,SOLID,SOLID_COLORS, SOLID_COLORS_VERTEX, SOLID_FLAT, SOLID_SMOOTH} _modo;
+typedef enum{POINTS,EDGES,SOLID,SOLID_COLORS, SOLID_COLORS_VERTEX} _modo;
 
 //*************************************************************************
 // clase punto
@@ -36,32 +36,17 @@ public:
 
 	_triangulos3D();
 void 	draw_aristas(float r, float g, float b, int grosor);
-void  draw_solido(float r, float g, float b);
+void    draw_solido(float r, float g, float b);
 void 	draw_solido_colores();
-void  draw_solido_plano();
-void  draw_solido_suave(); 
 void 	draw(_modo modo, float r, float g, float b, float grosor);
 void 	draw_solido_colores_vertices();
 
 /* asignación de colores */
 void 	colors_random();
 void 	colors_chess(float r1, float g1, float b1, float r2, float g2, float b2);
-void 	colors_lambert_c(float l_x, float l_y, float l_z, float r, float g, float b);
-
-void  calcular_normales_caras();
-void  calcular_normales_vertices();
 
 vector<_vertex3i> caras;
 vector<_vertex3f> colores_caras;
-
-vector<_vertex3f> normales_caras;
-vector<_vertex3f> normales_vertices;
-
-// material
-_vertex4f ambiente;
-_vertex4f difuso;
-_vertex4f especular;
-float brillo;
 };
 
 
@@ -76,7 +61,16 @@ public:
 	_cubo(float tam=0.5);
 };
 
+//*************************************************************************
+// clase ejer1
+//*************************************************************************
 
+class _ejer1: public _triangulos3D
+{
+public:
+
+  _ejer1(float tam=0.5);
+};
 //*************************************************************************
 // clase piramide
 //*************************************************************************
@@ -120,7 +114,7 @@ void  parametros(vector<_vertex3f> perfil, int num, int tipo, int tapa_in, int t
 //*************************************************************************
 class _cilindro: public _rotacion{
 public:
-	_cilindro(float radio=1.0, float altura=2.0, int num=12);
+	_cilindro(float radio=1.0, float altura=2.0, int num=6);
 };
 
 //*************************************************************************
@@ -137,10 +131,15 @@ public:
 class _esfera: public _rotacion{
 public:
 	_esfera(float radio=1.0, int num1=6, int num2=6);
-
-  void calcular_normales_vertices();
 };
 
+//*************************************************************************
+// clase ejer2
+//*************************************************************************
+class _ejer2: public _rotacion{
+public:
+  _ejer2(float radio=1.0, int num1=6, int num2=6);
+};
 
 //************************************************************************
 // Rotación Archivo PLY
@@ -355,4 +354,73 @@ _hocico hocico;
 _cola cola;
 _ojo ojo;
 _pupila pupila;
+};
+
+
+//************************************************************************
+// base
+//************************************************************************
+
+class _base: public _triangulos3D
+{
+public:
+       _base();
+void  draw(_modo modo, float r, float g, float b, float grosor);
+
+float ancho;
+float alto;
+float fondo;
+
+protected:
+_cubo cubo;
+};
+
+//************************************************************************
+// Cl
+//************************************************************************
+
+class _cl: public _triangulos3D
+{
+public:
+      _cl();
+void  draw(_modo modo, float r, float g, float b, float grosor);
+       
+float alto;
+float radio;
+
+protected:
+_cilindro cilindro;
+};
+
+class _aspa: public _triangulos3D
+{
+public:
+      _aspa();
+void  draw(_modo modo, float r, float g, float b, float grosor);
+       
+float radio;
+
+protected:
+_esfera esfera;
+};
+
+//************************************************************************
+// Ejer3
+//************************************************************************
+
+class _ejer3: public _triangulos3D
+{
+public:
+       _ejer3();
+       
+void  draw(_modo modo, float r, float g, float b, float grosor);
+  float giro_aspa;
+  float mov_cl;
+  float mov_cl_min;
+  float mov_cl_max;
+
+protected:
+_base base;
+_cl cl;
+_aspa aspa;
 };

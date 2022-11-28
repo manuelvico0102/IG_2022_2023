@@ -37,6 +37,11 @@ glEnd();
 
 _triangulos3D::_triangulos3D()
 {
+  //ambiente_difuso=_vertex4f(1.0,0.8,0.0,1.0);   //Coeficiente ambiente y difuso
+  ambiente=_vertex4f(1.0,0.0,0.8,1.0);
+  difuso=_vertex4f(1.0,0.0,0.8,1.0);
+  especular=_vertex4f(0.5,0.5,0.5,1.0);         //Coeficiente especular
+  brillo=10;                               //Exponente del brillo
 }
 
 
@@ -120,6 +125,68 @@ void _triangulos3D::draw_solido_colores_vertices( )
   glEnd();
 }
 
+//*************************************************************************
+// dibujar en modo solido con iluminacion plana
+//*************************************************************************
+
+void _triangulos3D::draw_solido_plano()
+{
+  int i;
+  glEnable (GL_LIGHTING);
+  glEnable (GL_NORMALIZE);
+  glMaterialfv(GL_FRONT,GL_AMBIENT,(GLfloat*) &ambiente);
+  glMaterialfv(GL_FRONT,GL_DIFFUSE,(GLfloat*) &difuso);
+  glMaterialfv(GL_FRONT,GL_SPECULAR,(GLfloat*) &especular);
+  glMaterialf(GL_FRONT,GL_SHININESS,brillo);
+
+  glPolygonMode(GL_FRONT,GL_FILL);
+  glBegin(GL_TRIANGLES);
+  for(i = 0; i < caras.size(); i++){
+    //Aqui poner una condicion para que cada vez sea un color distinto
+    glNormal3f(normales_caras[i].x, normales_caras[i].y, normales_caras[i].z);
+    glVertex3fv((GLfloat *) &vertices[caras[i]._0]);
+    glVertex3fv((GLfloat *) &vertices[caras[i]._1]);
+    glVertex3fv((GLfloat *) &vertices[caras[i]._2]);
+  }
+  glEnd();
+  glDisable (GL_LIGHTING);
+}
+
+//*************************************************************************
+// dibujar en modo solido con iluminacion suae //El suave igual pero con verrtices
+//*************************************************************************
+
+void _triangulos3D::draw_solido_suave()
+{
+  int i;
+  glEnable (GL_LIGHTING);
+  glEnable (GL_NORMALIZE);
+  glMaterialfv(GL_FRONT,GL_AMBIENT,(GLfloat*) &ambiente);
+  glMaterialfv(GL_FRONT,GL_DIFFUSE,(GLfloat*) &difuso);
+  glMaterialfv(GL_FRONT,GL_SPECULAR,(GLfloat*) &especular);
+  glMaterialf(GL_FRONT,GL_SHININESS,brillo);
+
+  glPolygonMode(GL_FRONT,GL_FILL);
+  glBegin(GL_TRIANGLES);
+  for(i = 0; i < caras.size(); i++){
+    //Aqui poner una condicion para que cada vez sea un color distinto
+    /*glNormal3f(normales_vertices[i].x, normales_vertices[i].y, normales_vertices[i].z);
+    glVertex3fv((GLfloat *) &vertices[caras[i]._0]);
+    glVertex3fv((GLfloat *) &vertices[caras[i]._1]);
+    glVertex3fv((GLfloat *) &vertices[caras[i]._2]);*/
+    glNormal3fv((GLfloat *) &normales_vertices[caras[i]._0]);
+    glVertex3fv((GLfloat *) &vertices[caras[i]._0]);
+    glNormal3fv((GLfloat *) &normales_vertices[caras[i]._1]);
+    glVertex3fv((GLfloat *) &vertices[caras[i]._1]);
+    glNormal3fv((GLfloat *) &normales_vertices[caras[i]._2]);
+    glVertex3fv((GLfloat *) &vertices[caras[i]._2]);
+
+  }
+  glEnd();
+  glDisable (GL_LIGHTING);
+}
+
+
 
 //*************************************************************************
 // dibujar con distintos modos
@@ -133,6 +200,8 @@ switch (modo){
 	case SOLID:draw_solido(r, g, b);break;
 	case SOLID_COLORS:draw_solido_colores();break;
   case SOLID_COLORS_VERTEX:draw_solido_colores_vertices();break;
+  case SOLID_FLAT:draw_solido_plano();break;
+  case SOLID_SMOOTH:draw_solido_suave();break;
 	}
 }
 
@@ -200,9 +269,9 @@ void _triangulos3D::colors_lambert_c(float l_x, float l_y, float l_z, float r, f
 		
 		if(p_escalar <= 0) p_escalar = 0;
 
-		colores_caras[i].r=r*p_escalar;
-      	colores_caras[i].g=g*p_escalar;
-      	colores_caras[i].b=b*p_escalar;
+		colores_caras[i].r=r*0.2+r*p_escalar;
+      	colores_caras[i].g=g*0.2+g*p_escalar;
+      	colores_caras[i].b=b*0.2+b*p_escalar;
 	}
 }
 
@@ -236,12 +305,41 @@ void _triangulos3D::calcular_normales_caras(){
 //*************************************************************************
 
 void _triangulos3D::calcular_normales_vertices(){
-	int i, n_v;
+	calcular_normales_caras();
+  int n_v;
 	n_v=vertices.size();
 	normales_vertices.resize(n_v);
+
+  //Ponemos las normales a 0
+  for(int i = 0; i<n_v; i++)
+    normales_vertices[i]=_vertex3f(0.0,0.0,0.0);
 	
+  //Sumarmos a los tres vertices que pertenecen a una cara
+  //el valor de la normal a esa cara.
+  for(int i = 0; i<caras.size(); i++){
+    normales_vertices[caras[i]._0] += normales_caras[i];
+    normales_vertices[caras[i]._1] += normales_caras[i];
+    normales_vertices[caras[i]._2] += normales_caras[i];
+  }
+
+  //Normalizamos la normal a cada vértice, usamos la función normalize para simplificar
+  for(int i = 0; i<n_v; i++){
+    normales_vertices[i].normalize();
+  }
 }
 
+//*************************************************************************
+void _esfera::calcular_normales_vertices(){
+  normales_vertices.resize(vertices.size());
+
+  for(int i = 0; i<vertices.size(); i++){
+    normales_vertices[i] = _vertex3f(0.0,0.0,0.0);
+    normales_vertices[i]._0=vertices[i]._0;
+    normales_vertices[i]._1=vertices[i]._1;
+    normales_vertices[i]._2=vertices[i]._2;
+    normales_vertices[i].normalize();   
+  }
+}
 
 
 //*************************************************************************
@@ -289,8 +387,13 @@ _cubo::_cubo(float tam)
   caras[10]._0=4; caras[10]._1=5; caras[10]._2=7;     //C10
   caras[11]._0=5; caras[11]._1=6; caras[11]._2=7;     //C11
 
+//Calcular normales
+  calcular_normales_caras();
+  calcular_normales_vertices();
+
 //Colores a las caras
   colors_random();
+
 
 }
 
@@ -326,6 +429,10 @@ caras[3]._0=3;caras[3]._1=0;caras[3]._2=4;
 caras[4]._0=3;caras[4]._1=1;caras[4]._2=0;
 caras[5]._0=3;caras[5]._1=2;caras[5]._2=1;
 
+//Calcular normales
+  calcular_normales_caras();
+  calcular_normales_vertices();
+
 //Colores a las caras
 colors_random();
 }
@@ -338,7 +445,11 @@ colors_random();
 _objeto_ply::_objeto_ply() 
 {
    // leer lista de coordenadas de vértices y lista de indices de vértices
- 
+  //Material bronce
+  ambiente=_vertex4f(0.2125f, 0.1275f, 0.054f, 1.0f);
+  difuso=_vertex4f(0.714f, 0.4284f, 0.18144f, 1.0f);
+  especular=_vertex4f(0.393548f, 0.271906f, 0.166721f, 1.0f);
+  brillo=25.6;   
 }
 
 
@@ -367,12 +478,12 @@ for(int i = 0; i<n_ver; i++){
   vertices[i].z=ver_ply[3*i+2];
 }
 
-/*colores_vertices.resize(n_ver);
+colores_vertices.resize(n_ver);
 for(int i=0; i<n_ver; i++){
   colores_vertices[i].r=rand()%1000/1000.0;
   colores_vertices[i].g=rand()%1000/1000.0; 
   colores_vertices[i].b=rand()%1000/1000.0; 
-}*/
+}
 
 //Caras 
 for(int i = 0; i<n_car; i++){
@@ -382,11 +493,12 @@ for(int i = 0; i<n_car; i++){
 }
 
 
-//normales a caras
-calcular_normales_caras();
+//Calcular normales
+  calcular_normales_caras();
+  calcular_normales_vertices();
 
 //Colores a las caras
-colors_lambert_c(0, 10, 40, 0.8, 0.4, 0.0);
+colors_lambert_c(-20, 20, 10, 1.0, 0.8, 0.0);
 
 /*colores_caras.resize(n_car);
 
@@ -499,26 +611,14 @@ void _rotacion::parametros(vector<_vertex3f> perfil, int num, int tipo, int tapa
     }
   }
 
+  //Calcular normales
   calcular_normales_caras();
+  calcular_normales_vertices();
+
   //Colores a las caras
   colors_lambert_c(0, 20, 20, 1.0, 0.4, 0.7);
   //colors_random();
-  /*colores_caras.resize(caras.size());
 
-  for(int i=0; i<caras.size(); i++){
-
-    if(tipo == 0){
-      if(vertices[caras[i]._0].y>=0.0){
-        colores_caras[i].r=0.0; 
-        colores_caras[i].g=(rand()%1000/1000.0)+0.2;
-        colores_caras[i].b=0.0;
-      }else{
-        colores_caras[i].r=0.0; 
-        colores_caras[i].g=0.0;
-        colores_caras[i].b=(rand()%1000/1000.0)-0.3;
-      }
-    }
-  }*/
 }
 
 
@@ -564,6 +664,7 @@ _esfera::_esfera(float radio, int num1, int num2){
     perfil.push_back(aux);
   }
   parametros(perfil,num2,2,1,1);
+  calcular_normales_vertices();
 }
 
 
@@ -645,6 +746,10 @@ for (i=0;i<num_aux;i++)
       
    }
 
+//Calcular normales
+  calcular_normales_caras();
+  calcular_normales_vertices();
+
    //Colores a las caras
 	colors_random();
 }
@@ -666,6 +771,12 @@ _cabeza::_cabeza()
 	alto=0.4;
 	fondo=0.55;
 	cubo.colors_chess(1.0,0.5,0.0,1.0,0.35,0.0);
+
+  //Material bronce
+  cubo.ambiente=_vertex4f(0.2125f, 0.1275f, 0.054f, 1.0f);
+  cubo.difuso=_vertex4f(0.714f, 0.4284f, 0.18144f, 1.0f);
+  cubo.especular=_vertex4f(0.393548f, 0.271906f, 0.166721f, 1.0f);
+  cubo.brillo=25.6;                                   
 };
 
 void _cabeza::draw(_modo modo, float r, float g, float b, float grosor)
@@ -686,6 +797,12 @@ _cuerpo::_cuerpo()
 	alto=0.4;
 	fondo=0.5;
 	cubo.colors_chess(1.0,0.5,0.0,1.0,0.35,0.0);
+
+  //Material cobre
+  cubo.ambiente=_vertex4f(0.19125f, 0.0735f, 0.0225f, 1.0f );
+  cubo.difuso=_vertex4f(0.7038f, 0.27048f, 0.0828f, 1.0f);
+  cubo.especular=_vertex4f(0.256777f, 0.137622f, 0.086014f, 1.0f);
+  cubo.brillo=12.8;    
 };
 
 void _cuerpo::draw(_modo modo, float r, float g, float b, float grosor)
@@ -706,6 +823,12 @@ _pata::_pata()
 	alto=0.25;
 	fondo=0.1;
 	cubo.colors_chess(1.0,0.5,0.0,1.0,0.35,0.0);
+
+  //Material cobre pulido
+  cubo.ambiente=_vertex4f(0.2295f, 0.08825f, 0.0275f, 1.0f );
+  cubo.difuso=_vertex4f(0.5508f, 0.2118f, 0.066f, 1.0f);
+  cubo.especular=_vertex4f(0.580594f, 0.223257f, 0.0695701f, 1.0f);
+  cubo.brillo=51.2;    
 };
 
 void _pata::draw(_modo modo, float r, float g, float b, float grosor)
@@ -726,6 +849,12 @@ _oreja::_oreja()
 	alto=0.1;
 	fondo=0.1;
 	piramide.colors_chess(1.0,0.5,0.0,1.0,0.35,0.0);
+
+  //Material cobre pulido
+  piramide.ambiente=_vertex4f(0.2295f, 0.08825f, 0.0275f, 1.0f );
+  piramide.difuso=_vertex4f(0.5508f, 0.2118f, 0.066f, 1.0f);
+  piramide.especular=_vertex4f(0.580594f, 0.223257f, 0.0695701f, 1.0f);
+  piramide.brillo=51.2;
 };
 
 void _oreja::draw(_modo modo, float r, float g, float b, float grosor)
@@ -745,6 +874,12 @@ _hocico::_hocico()
 	alto=0.1;
 	fondo=0.25;
 	cubo.colors_chess(0.0,0.0,0.0,0.0,0.0,0.0);
+
+  //Material black plastic
+  cubo.ambiente=_vertex4f(0.0f, 0.0f, 0.0f, 1.0f);
+  cubo.difuso=_vertex4f(0.01f, 0.01f, 0.01f, 1.0f);
+  cubo.especular=_vertex4f(0.50f, 0.50f, 0.50f, 1.0f);
+  cubo.brillo=32.0;  
 };
 
 void _hocico::draw(_modo modo, float r, float g, float b, float grosor)
@@ -761,9 +896,15 @@ void _hocico::draw(_modo modo, float r, float g, float b, float grosor)
 
 _cola::_cola()
 {
-alto=0.25;
-radio=0.1;
-cilindro.colors_chess(1.0,0.5,0.0,1.0,0.35,0.0);
+  alto=0.25;
+  radio=0.1;
+  cilindro.colors_chess(1.0,0.5,0.0,1.0,0.35,0.0);
+
+  //Material cobre pulido
+  cilindro.ambiente=_vertex4f(0.2295f, 0.08825f, 0.0275f, 1.0f );
+  cilindro.difuso=_vertex4f(0.5508f, 0.2118f, 0.066f, 1.0f);
+  cilindro.especular=_vertex4f(0.580594f, 0.223257f, 0.0695701f, 1.0f);
+  cilindro.brillo=51.2;
 };
 
 void _cola::draw(_modo modo, float r, float g, float b, float grosor)
@@ -793,6 +934,12 @@ glScalef(radio, radio, radio);
 esfera.draw(modo, r, g, b, grosor);
 glPopMatrix();
 
+//Material white rubber
+  esfera.ambiente=_vertex4f(0.05f,0.05f,0.05f,1.0f);
+  esfera.difuso=_vertex4f(0.5f,0.5f,0.5f,1.0f);
+  esfera.especular=_vertex4f(0.7f,0.7f,0.7f,1.0f);
+  esfera.brillo=10.0;                    
+
 };
 
 //************************************************************************
@@ -811,6 +958,12 @@ glPushMatrix();
 glScalef(radio, radio, radio);
 esfera.draw(modo, r, g, b, grosor);
 glPopMatrix();
+
+//Material black plastic
+  esfera.ambiente=_vertex4f(0.0f, 0.0f, 0.0f, 1.0f);
+  esfera.difuso=_vertex4f(0.01f, 0.01f, 0.01f, 1.0f);
+  esfera.especular=_vertex4f(0.50f, 0.50f, 0.50f, 1.0f);
+  esfera.brillo=32.0;  
 
 };
 

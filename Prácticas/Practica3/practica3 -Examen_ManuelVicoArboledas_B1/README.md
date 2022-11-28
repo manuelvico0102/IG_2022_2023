@@ -8,9 +8,7 @@ Para la visualización de los diferentes modelos se pueden visualizar de cinco m
 * 2 ------> Bordes
 * 3 ------> Sólido
 * 4 ------> Sólido colores
-* 5 ------> iluminación plano
-* 6 ------> iluminación con suavizado de Gouraud
-* 8 ------> Sólido colores vértices
+* 5 ------> Sólido colores vértices
 
 ## Tipos de objetos
 En esta práctica hay diferentes objetos en los cuales se encuentra: Pirámide, Cubo, Objeto_ply, Rotación, Cilindro, Cono, Esfera, Figura_Ply(Creada por mí), Zorro y Extrusión. Para visualizarlos puede hacerlo de la siguiente forma:
@@ -27,7 +25,7 @@ En esta práctica hay diferentes objetos en los cuales se encuentra: Pirámide, 
 * X ------> Extrusión
 
 ## Teclas especiales
-En este programa hay teclas especiales para la realización de algunos casos. Las teclas especiales son las de acontinuación:
+En este programa hay teclas especiales para la realización de algunos casos. Las teclas especiales son las de a continuación:
 * Q ------> Finaliza el programa
 * Flecha izquierda ------> Mueve el ángulo hacia la izquierda
 * Flecha derecha ------> Mueve el ángulo hacia la derecha
@@ -50,38 +48,5 @@ En este programa hay teclas especiales para la realización de algunos casos. La
 * F12 ------> Mueve patas delanteras del zorro hacia detrás
 * HOME/Inicio ------> Mueve cola del zorro hacia la izquierda
 * END/Fin ------> Mueve cola del zorro hacia la derecha
-
-* I ------> Activa/Apaga la luz 2
-* V ------> Rotación positiva de la luz 2
-* B ------> Rotación negativa de la luz 2
-
-## Información sobre los materiales del modelo jerárquico
-Los materiales que he usado para el modelo jerárquico son Bronce, Cobre, Cobre pulido, Black Plastic y White Rubber de la siguiente forma:
-* Cabeza ------> Bronce
-* Cuerpo ------> Cobre
-* Pata ------> Cobre pulido
-* Oreja ------> Cobre pulido
-* Hocico ------> Black Plastic
-* Cola ------> Cobre pulido
-* Ojo ------> White Rubber
-* Pupila ------> Black Plastic
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

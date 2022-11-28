@@ -13,7 +13,7 @@
 using namespace std;
 
 // tipos
-typedef enum{CUBO, PIRAMIDE, OBJETO_PLY, ROTACION, CILINDRO, CONO, ESFERA, FIGURA_PLY, EXTRUSION, ZORRO} _tipo_objeto;
+typedef enum{CUBO, PIRAMIDE, OBJETO_PLY, ROTACION, CILINDRO, CONO, ESFERA, FIGURA_PLY, EXTRUSION, ZORRO, EJER1, EJER2, EJER3} _tipo_objeto;
 _tipo_objeto t_objeto=CUBO;
 _modo   modo=POINTS;
 
@@ -40,15 +40,16 @@ _esfera esfera(1,20,20);
 _extrusion *extrusion;
 _rotacion_PLY figura;
 _zorro zorro;
+_ejer1 ejer1;
+_ejer2 ejer2(0.5,20,20);
+_ejer3 ejer3;
 
 //_objeto_ply *ply;
-int animacion, activaluz2 = 0;
+int animacion = 0;
 float giro1, giro2, giro3, giro4, giro5, giro6, giro7 = 0;
 int flag1, flag2, flag3, flag4, flag5, flag6, flag7 = 0;
 int accion1 = 0;
 int parada1, parada2, parada3 = 0;
-
-float mov_luz = 0;
 //**************************************************************************
 //
 //***************************************************************************
@@ -123,9 +124,9 @@ glEnd();
 void draw_objects()
 {
 
-    switch (t_objeto){
-	    case CUBO: cubo.draw(modo,1.0,0.0,0.0,5);break;
-	    case PIRAMIDE: piramide.draw(modo,1.0,0.0,0.0,5);break;
+switch (t_objeto){
+	case CUBO: cubo.draw(modo,1.0,0.0,0.0,5);break;
+	case PIRAMIDE: piramide.draw(modo,1.0,0.0,0.0,5);break;
         case OBJETO_PLY: ply.draw(modo,1.0,0.6,0.0,5);break;
         case ROTACION: rotacion.draw(modo,1.0,0.0,0.0,5);break;
         case CILINDRO: cilindro.draw(modo,1.0,0.0,0.0,5);break;
@@ -134,68 +135,22 @@ void draw_objects()
         case FIGURA_PLY: figura.draw(modo,1.0,0.6,0.0,5);break;
         case EXTRUSION: extrusion->draw(modo,1.0,0.0,0.0,5);break;
         case ZORRO: zorro.draw(modo,1.0,0.0,0.0,5);break;
+    case EJER1: ejer1.draw(modo,1.0,0.0,0.0,5);break;
+    case EJER2: ejer2.draw(modo,1.0,0.0,0.0,5);break;
+    case EJER3: ejer3.draw(modo,1.0,0.0,0.0,5);break;
 	}
 
-}
-
-//**************************************************************************
-// luces
-//**************************************************************************
-
-void luces(){
-    /*GLfloat luz_ambiente [ ] = {0.2, 0.2, 0.2, 1.0},
-            luz_difusa [ ] = {1.0, 1.0, 1.0, 1.0},
-            luz_especular [ ] = {1.0, 0.0, 1.0, 1.0},
-            luz_posicion [ ] = {-20.0, 20.0, 20.0, 1.0};
-
-    //Tantas veces como luces hayamos creado
-    glLightfv(GL_LIGHT1,GL_AMBIENT,luz_ambiente);
-    glLightfv(GL_LIGHT1,GL_DIFFUSE,luz_difusa);
-    glLightfv(GL_LIGHT1,GL_SPECULAR,luz_especular);
-    glLightfv(GL_LIGHT1,GL_POSITION,luz_posicion);
-    */
-    //Primera luz
-        glEnable (GL_LIGHT1);
-        glDisable(GL_LIGHT0);
-
-        GLfloat luz1 [ ] = {1.0, 1.0, 1.0, 1.0};
-        GLfloat pos1 [ ] = {0.0, 10, 10, 0.0};      //0 = direccional
-
-        glLightfv(GL_LIGHT1,GL_DIFFUSE,luz1);
-        glLightfv(GL_LIGHT1,GL_SPECULAR,luz1);
-        glLightfv(GL_LIGHT1,GL_POSITION,pos1);
-        
-
-        GLfloat luz2_difusa [ ] = {0.5, 0.0, 1.0, 1.0},
-                luz2_especular [ ] = {0.5, 0.0, 1.0, 1.0};
-        GLfloat pos2 [ ] = {0.0, 10, 10, 1.0};      //1 = puntual
-
-        glLightfv(GL_LIGHT2,GL_DIFFUSE,luz2_difusa);
-        glLightfv(GL_LIGHT2,GL_SPECULAR,luz2_especular);
-        
-        glPushMatrix();
-            glRotatef(mov_luz, 0,1,0);
-            glLightfv(GL_LIGHT2,GL_POSITION,pos2);
-        glPopMatrix();
-
-        if(activaluz2==0){
-            glDisable(GL_LIGHT2);
-        }else{
-            glEnable (GL_LIGHT2);
-        }
-    
 }
 
 
 //**************************************************************************
 //
-//**************************************************************************
+//***************************************************************************
 
 void draw(void)
 {
 clean_window();
 change_observer();
-luces();
 draw_axis();
 draw_objects();
 glutSwapBuffers();
@@ -234,35 +189,33 @@ glutPostRedisplay();
 
 void normal_key(unsigned char Tecla1,int x,int y)
 {
-    switch (toupper(Tecla1)){
-    	case 'Q':exit(0);
-    	case '1':modo=POINTS;break;
-    	case '2':modo=EDGES;break;
-    	case '3':modo=SOLID;break;
-    	case '4':modo=SOLID_COLORS;break;
-        case '5':modo=SOLID_FLAT;break;
-        case '6':modo=SOLID_SMOOTH;break;
-    	case '8':modo=SOLID_COLORS_VERTEX;break;
-    	case 'S': 
-    		if(animacion==0){
-    			giro1=0.25;
-                giro2=2.5;
-                giro3=2.5;
-                giro4=0.5;
-                giro5=0.5;
-                giro6=0.5;
-                giro7=1.0;
-    	       	animacion=1;
-    		}else{
-    			giro1=0;
-                giro2=0;
-                giro3=0;
-                giro4=0;
-                giro5=0;
-                giro6=0;
-                giro7=0;
-    			animacion=0;
-    		};break;
+switch (toupper(Tecla1)){
+	case 'Q':exit(0);
+	case '1':modo=POINTS;break;
+	case '2':modo=EDGES;break;
+	case '3':modo=SOLID;break;
+	case '4':modo=SOLID_COLORS;break;
+	case '5':modo=SOLID_COLORS_VERTEX;break;
+	case 'S': 
+		if(animacion==0){
+			giro1=0.25;
+            giro2=2.5;
+            giro3=2.5;
+            giro4=0.5;
+            giro5=0.5;
+            giro6=0.5;
+            giro7=1.0;
+	       	animacion=1;
+		}else{
+			giro1=0;
+            giro2=0;
+            giro3=0;
+            giro4=0;
+            giro5=0;
+            giro6=0;
+            giro7=0;
+			animacion=0;
+		};break;
         case 'P':t_objeto=PIRAMIDE;break;
         case 'C':t_objeto=CUBO;break;
         case 'O':t_objeto=OBJETO_PLY;break;	
@@ -273,17 +226,11 @@ void normal_key(unsigned char Tecla1,int x,int y)
         case 'F':t_objeto=FIGURA_PLY;break;
         case 'A':t_objeto=ZORRO;break;	
         case 'X':t_objeto=EXTRUSION;break;
-        case 'I':
-            if(activaluz2==0){
-                activaluz2=1;
-            }else{
-                activaluz2=0;
-            }break;
-        case 'V': mov_luz+=2;break;
-        case 'B': mov_luz-=2;break;
-
-    }
-    glutPostRedisplay();
+        case 'V':t_objeto=EJER1;break;
+        case 'B':t_objeto=EJER2;break;
+        case 'M':t_objeto=EJER3;break;  
+	}
+glutPostRedisplay();
 }
 
 //***************************************************************************
@@ -307,15 +254,15 @@ switch (Tecla1){
 	case GLUT_KEY_PAGE_UP:Observer_distance*=1.2;break;
 	case GLUT_KEY_PAGE_DOWN:Observer_distance/=1.2;break;
 
-	case GLUT_KEY_F1:zorro.giro_cuerpo+=1;
-        if (zorro.giro_cuerpo > zorro.giro_cuerpo_max)
-            zorro.giro_cuerpo = zorro.giro_cuerpo_max;break;
-   	case GLUT_KEY_F2:zorro.giro_cuerpo-=1;
-        if (zorro.giro_cuerpo < zorro.giro_cuerpo_min) 
-            zorro.giro_cuerpo = zorro.giro_cuerpo_min;break;
-    case GLUT_KEY_F3:zorro.giro_cabeza+=1;
-        if (zorro.giro_cabeza > zorro.giro_cabeza_max)
-            zorro.giro_cabeza = zorro.giro_cabeza_max;break;
+	case GLUT_KEY_F1:ejer3.giro_aspa-=5;break;
+
+   	case GLUT_KEY_F2:ejer3.mov_cl-=0.1;
+        if (ejer3.mov_cl < ejer3.mov_cl_min) 
+            ejer3.mov_cl = ejer3.mov_cl_min;break;
+    case GLUT_KEY_F3:ejer3.mov_cl+=0.1;
+        if (ejer3.mov_cl > ejer3.mov_cl_max)
+            ejer3.mov_cl = ejer3.mov_cl_max;break;
+
    	case GLUT_KEY_F4:zorro.giro_cabeza-=1;
         if (zorro.giro_cabeza < zorro.giro_cabeza_min) 
             zorro.giro_cabeza = zorro.giro_cabeza_min;break;
