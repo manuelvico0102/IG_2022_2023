@@ -38,8 +38,8 @@ glEnd();
 _triangulos3D::_triangulos3D()
 {
   //ambiente_difuso=_vertex4f(1.0,0.8,0.0,1.0);   //Coeficiente ambiente y difuso
-  ambiente=_vertex4f(1.0,0.0,0.8,1.0);
-  difuso=_vertex4f(1.0,0.0,0.8,1.0);
+  ambiente=_vertex4f(1.0,0.8,0.0,1.0);
+  difuso=_vertex4f(1.0,0.8,0.0,1.0);
   especular=_vertex4f(0.5,0.5,0.5,1.0);         //Coeficiente especular
   brillo=10;                               //Exponente del brillo
 }
@@ -445,11 +445,7 @@ colors_random();
 _objeto_ply::_objeto_ply() 
 {
    // leer lista de coordenadas de vértices y lista de indices de vértices
-  //Material bronce
-  ambiente=_vertex4f(0.2125f, 0.1275f, 0.054f, 1.0f);
-  difuso=_vertex4f(0.714f, 0.4284f, 0.18144f, 1.0f);
-  especular=_vertex4f(0.393548f, 0.271906f, 0.166721f, 1.0f);
-  brillo=25.6;   
+
 }
 
 

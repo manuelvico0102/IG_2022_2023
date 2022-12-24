@@ -1,10 +1,10 @@
 LIBS=-L/usr/X11R6/lib/ -lGL -lGLU -lglut -lm -lX11 -lpthread
 
-EJECUTABLE=ejemplo
+EJECUTABLE= ejemplo
 
 x: $(EJECUTABLE)
-	./$(EJECUTABLE)
-
+	./$(EJECUTABLE) 
+	
 all: ejemplo
 
 ejemplo: opengl_textura.cc ../CImg.h

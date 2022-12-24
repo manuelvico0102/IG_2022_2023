@@ -49,6 +49,15 @@ int accion1 = 0;
 int parada1, parada2, parada3 = 0;
 
 float mov_luz = 0;
+
+int estadoRaton, xc, yc;
+float factor = 1.0;
+
+float Ancho = Window_width;
+float Alto = Window_high;
+int cambio = 0;
+
+
 //**************************************************************************
 //
 //***************************************************************************
@@ -72,7 +81,8 @@ glLoadIdentity();
 
 // formato(x_minimo,x_maximo, y_minimo, y_maximo,plano_delantero, plano_traser)
 //  plano_delantero>0  plano_trasero>PlanoDelantero)
-glFrustum(-Size_x,Size_x,-Size_y,Size_y,Front_plane,Back_plane);
+//glFrustum(-Size_x,Size_x,-Size_y,Size_y,Front_plane,Back_plane);
+glFrustum(-Size_x,Size_x,-Size_y,Size_y,Front_plane*factor,Back_plane);
 }
 
 //**************************************************************************
@@ -166,12 +176,12 @@ void luces(){
         glLightfv(GL_LIGHT1,GL_POSITION,pos1);
         
 
-        GLfloat luz2_difusa [ ] = {0.5, 0.0, 1.0, 1.0},
-                luz2_especular [ ] = {0.5, 0.0, 1.0, 1.0};
-        GLfloat pos2 [ ] = {0.0, 10, 10, 1.0};      //1 = puntual
+        GLfloat luz2[ ] = {0.5, 0.0, 1.0, 1.0};
+        
+        GLfloat pos2 [ ] = {10.0, 5, 0, 1.0};      //1 = puntual
 
-        glLightfv(GL_LIGHT2,GL_DIFFUSE,luz2_difusa);
-        glLightfv(GL_LIGHT2,GL_SPECULAR,luz2_especular);
+        glLightfv(GL_LIGHT2,GL_DIFFUSE,luz2);
+        glLightfv(GL_LIGHT2,GL_SPECULAR,luz2);
         
         glPushMatrix();
             glRotatef(mov_luz, 0,1,0);
@@ -186,6 +196,38 @@ void luces(){
     
 }
 
+void vista_orto(){
+    glViewport(Ancho/2,Alto/2,Ancho/2,Alto/2);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    //Si en vez de multiplicar divides por el factor al echar la ruleta del raton
+    //hacia delante se hará el zoom.
+    glOrtho(-5/factor,5/factor,-5/factor,5/factor,-100,100);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    draw_axis();
+    draw_objects();
+
+    glViewport(0,Alto/2,Ancho/2,Alto/2);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(-5/factor,5/factor,-5/factor,5/factor,-100,100);
+    glRotatef(90,1,0,0);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    draw_axis();
+    draw_objects();
+
+    glViewport(0,0,Ancho/2,Alto/2);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(-5/factor,5/factor,-5/factor,5/factor,-100,100);
+    glRotatef(90,0,1,0);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    draw_axis();
+    draw_objects();
+}
 
 //**************************************************************************
 //
@@ -193,12 +235,26 @@ void luces(){
 
 void draw(void)
 {
+glDrawBuffer(GL_FRONT);
 clean_window();
-change_observer();
-luces();
-draw_axis();
-draw_objects();
-glutSwapBuffers();
+if(cambio==0){
+    glViewport(0,0,Ancho,Alto);
+    change_projection();
+    change_observer();
+    luces();
+    draw_axis();
+    draw_objects();
+}else vista_orto();
+
+if(animacion==1)glutSwapBuffers();
+
+if (t_objeto==ZORRO){
+   glDrawBuffer(GL_BACK);
+   clean_window();
+   change_observer();
+   zorro.seleccion();
+} 
+glFlush();
 }
 
 
@@ -281,6 +337,12 @@ void normal_key(unsigned char Tecla1,int x,int y)
             }break;
         case 'V': mov_luz+=2;break;
         case 'B': mov_luz-=2;break;
+        case 'M':
+            if(cambio==0){
+                cambio=1;
+            }else{
+                cambio=0;
+            }break;
 
     }
     glutPostRedisplay();
@@ -606,7 +668,7 @@ void movimiento(){
 
             if(flag2==0 && flag3==0 && flag5==1 && flag6==1 && flag7 == 1){
             	accion1 +=1;
-            	sleep(10);
+            	//sleep(5);
             }
         }else if(accion1 == 7){
         	//Volver a la posición normal
@@ -659,6 +721,91 @@ void movimiento(){
         }
 
     	glutPostRedisplay();
+    }
+}
+
+//***************************************************************************
+// Funciones para la selección por color
+//***************************************************************************
+
+void procesar_color(unsigned char color[3])
+{
+    int i;
+
+    for (i=0;i<zorro.piezas;i++){
+        if (color[0]==zorro.color_select[i].r &&
+            color[1]==zorro.color_select[i].g &&
+            color[2]==zorro.color_select[i].r){
+           if (zorro.activo[i]==0){
+                zorro.activo[i]=1;
+            }else{
+                zorro.activo[i]=0;
+            }
+            
+            glutPostRedisplay();
+        }
+    }             
+}
+
+//***************************************************************************
+
+void pick_color(int x, int y)
+{
+GLint viewport[4];
+unsigned char pixel[3];
+
+glGetIntegerv(GL_VIEWPORT, viewport);
+glReadBuffer(GL_BACK);
+glReadPixels(x,viewport[3]-y,1,1,GL_RGB,GL_UNSIGNED_BYTE,(GLubyte *) &pixel[0]);
+printf(" valor x %d, valor y %d, color %d, %d, %d \n",x,y,pixel[0],pixel[1],pixel[2]);
+
+procesar_color(pixel);
+}
+
+//***************************************************************************
+// Funciones para manejo de eventos del ratón
+//***************************************************************************
+
+void clickRaton( int boton, int estado, int x, int y )
+{
+    if(boton==GLUT_RIGHT_BUTTON){
+        if(estado==GLUT_DOWN){
+          estadoRaton=1;
+          xc=x;
+          yc=y;
+        }else estadoRaton=0;
+    }
+
+    if(boton==GLUT_LEFT_BUTTON){
+       if(estado==GLUT_DOWN){
+          estadoRaton=2;
+          xc=x;
+          yc=y;
+          pick_color(xc, yc);
+        } 
+    }
+
+    if(boton==3){
+        factor*=1.1;
+        glutPostRedisplay();
+    }
+
+    if(boton==4){
+        factor*=0.9;
+        glutPostRedisplay();
+    }
+}
+
+/*************************************************************************/
+
+void RatonMovido( int x, int y )
+{ 
+if(estadoRaton==1) 
+    {Observer_angle_y=Observer_angle_y-(x-xc);
+     Observer_angle_x=Observer_angle_x+(y-yc);
+     xc=x;
+     yc=y;
+     glutPostRedisplay();
     }
 }
 
@@ -818,6 +965,10 @@ initialize();
 ply.parametros(argv[1]);
 figura.parametros_PLY(argv[2],10);
 //ply = new _objeto_ply(argv[1]);
+
+// eventos ratón
+glutMouseFunc(clickRaton);
+glutMotionFunc(RatonMovido);
 
 // inicio del bucle de eventos
 glutMainLoop();
